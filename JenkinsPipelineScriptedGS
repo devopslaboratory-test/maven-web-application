@@ -7,25 +7,28 @@ node{
     stage('GettheCode'){
         git branch: 'development', credentialsId: 'a5127fb4-6603-4aa2-b16e-3362b2c64c99', url: 'https://github.com/devopslaboratory-test/maven-web-application.git'
     }
+    
     stage('Build'){
         sh "${mavenHome}/bin/mvn clean package"
     }
+    
     stage('ExecuteSonarQubeReport'){
         sh "${mavenHome}/bin/mvn sonar:sonar"
     }
+    
     stage('UploadArtifactToNexus'){
         sh "${mavenHome}/bin/mvn deploy"
     }
+    
     stage('DeployAppIntoTomcat'){
         sshagent(['5282e699-2110-4778-99b7-ef6431e3d359']){
         sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@13.233.55.221:/opt/apache-tomcat-9.0.48/webapps/"
-        }
+    }
+    
     stage('SendEmailNotification'){
         emailext body: '''Build is Over!!!
         
         Thanks,
         Devops Team''', subject: 'Build is Over!!!', to: 'devopspracticals@gmail.com, dsaivarshini@gmail.com'
     }
-    }
-    
 }
