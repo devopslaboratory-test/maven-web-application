@@ -1,0 +1,72 @@
+pipeline{
+    agent any
+    
+    tools{
+        maven "maven3.6.3"
+    }
+    
+    triggers{
+        pollSCM('* * * * *')
+        //githubPush()
+        //cron('* * * * *')
+    }
+    options{
+        timestamps()
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '10', artifactNumToKeepStr: '4', daysToKeepStr: '5', numToKeepStr: '4'))
+    }
+    stages{
+        stage('CheckOutCode'){
+            steps{
+                git branch: 'development', credentialsId: 'a5127fb4-6603-4aa2-b16e-3362b2c64c99',
+                url: 'https://github.com/devopslaboratory-test/maven-web-application.git'
+            }
+            
+        }
+        
+        stage('Build'){
+            steps{
+                sh "mvn clean package"
+            }
+        }
+        stage('ExecuteSonar'){
+            steps{
+                sh "mvn sonar:sonar"
+            }
+        }
+        stage('UploadIntoNexus'){
+            steps{
+                sh "mvn clean deploy"
+            }
+        }
+        stage('DeployIntoTomcat'){
+         steps{
+        sshagent(['5282e699-2110-4778-99b7-ef6431e3d359']){
+        sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@13.233.55.221:/opt/apache-tomcat-9.0.48/webapps/"
+                }
+            }
+        }
+        
+         
+    }
+    post{
+        success{
+            emailext body: '''Build is Over!!!
+
+Everything is Completed.
+
+Thanks & Regards,
+Devops Engineer.''', subject: 'Build is Over!!!', to: 'devopspracticals@gmail.com, naagsushanth@gmail.com' 
+
+        }
+        
+        failure{
+            emailext body: '''Build is Failed!!!
+
+Everything is got Failed.
+
+Thanks & Regards,
+Devops Engineer.''', subject: 'Build is Over!!!', to: 'devopspracticals@gmail.com, naagsushanth@gmail.com' 
+        }
+    }
+
+}
