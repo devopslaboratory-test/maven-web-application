@@ -2,7 +2,7 @@ node{
    
     def mavenHome = tool name: "maven3.6.3"
    
-   properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '5', numToKeepStr: '3')), pipelineTriggers([pollSCM('* * * * *')])])
+   properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '5', artifactNumToKeepStr: '5', daysToKeepStr: '5', numToKeepStr: '3')), pipelineTriggers([pollSCM('* * * * *')])])
    
     stage('GetCodeFromGit'){
         git credentialsId: 'a5127fb4-6603-4aa2-b16e-3362b2c64c99', url: 'https://github.com/devopslaboratory-test/maven-web-application.git'
