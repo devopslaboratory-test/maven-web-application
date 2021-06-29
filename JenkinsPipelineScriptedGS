@@ -4,7 +4,7 @@ node{
    
    properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '8', daysToKeepStr: '5', numToKeepStr: '5')), pipelineTriggers([pollSCM('* * * * *')])])
    
-    stage('GettheCode'){
+    stage('GetCodeFromGit'){
         git branch: 'development', credentialsId: 'a5127fb4-6603-4aa2-b16e-3362b2c64c99', url: 'https://github.com/devopslaboratory-test/maven-web-application.git'
     }
     
